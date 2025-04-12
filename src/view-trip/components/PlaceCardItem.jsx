@@ -6,46 +6,49 @@ import { Link } from 'react-router-dom';
 
 function PlaceCardItem({ place }) {
   const [photoUrl, setPhotoUrl] = useState();
+
   useEffect(() => {
-    place&&GetPlacePhoto();
+    place && GetPlacePhoto();
   }, [place]);
 
   const GetPlacePhoto = async () => {
-  const data = {
-    textQuery: place?.placeName
-  };
+    const data = {
+      textQuery: place?.placeName
+    };
 
-  try {
-    const resp = await GetPlaceDetails(data);
-    const photos = resp?.data?.places?.[0]?.photos;
+    try {
+      const resp = await GetPlaceDetails(data);
+      const photos = resp?.data?.places?.[0]?.photos;
 
-    if (photos && photos.length > 0) {
-      // Pick the first available photo
-      const firstPhotoName = photos[0].name;
-      const PhotoUrl = PHOTO_REF_URL.replace('{NAME}', firstPhotoName);
-      setPhotoUrl(PhotoUrl);
-    } else {
-      // Fallback image or null
+      if (photos && photos.length > 0) {
+        const firstPhotoName = photos[0].name;
+        const PhotoUrl = PHOTO_REF_URL.replace('{NAME}', firstPhotoName);
+        setPhotoUrl(PhotoUrl);
+      } else {
+        setPhotoUrl(null);
+      }
+    } catch (error) {
+      console.error("Error fetching place photo:", error);
       setPhotoUrl(null);
     }
-  } catch (error) {
-    console.error("Error fetching place photo:", error);
-    setPhotoUrl(null);
-  }
-};
+  };
 
   return (
     <Link
       to={'https://www.google.com/maps/search/?api=1&query=' + place.placeName}
       target="_blank"
     >
-      <div className="my-2 border rounded-xl p-3 mt-2 flex items-center gap-4 hover:scale-105 transition-all hover:shadow-md cursor-pointer">
-        <img src={photoUrl} className='rounded-xl h-[130px] w-[130px] object-cover' />
-        <div>
-          <h2 className="font-bold text-lg">{place.placeName}</h2>
-          <p className="text-sm text-gray-400">{place.placeDetails}</p>
-          <Button size="sm">
-            <FaMapLocationDot />
+      <div className="my-2 border rounded-xl p-3 mt-2 flex flex-col md:flex-row items-center md:items-start gap-4 hover:scale-105 transition-all hover:shadow-md cursor-pointer">
+        <img
+          src={photoUrl}
+          className="rounded-xl h-[180px] w-full md:w-[180px] object-cover"
+          alt={place.placeName}
+        />
+        <div className="w-full md:w-auto text-center md:text-left">
+          <h2 className="font-bold text-lg md:text-xl">{place.placeName}</h2>
+          <p className="text-sm text-gray-400 my-1">{place.placeDetails}</p>
+          <Button size="sm" className="mt-2">
+            <FaMapLocationDot className="mr-2" /> View on Map
           </Button>
         </div>
       </div>
